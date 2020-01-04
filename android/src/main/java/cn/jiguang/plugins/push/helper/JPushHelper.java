@@ -94,8 +94,21 @@ public class JPushHelper {
             Iterator<String> it = jsonObject.keys();
             while (it.hasNext()) {
                 String key = it.next();
-                String value = jsonObject.getString(key);
-                extrasMap.putString(key, value);
+                Object value = jsonObject.get(key);
+                if (value instanceof Integer) {
+                    int intToUse = ((Number) value).intValue();
+                    extrasMap.putInt(key, intToUse);
+                } else if (value instanceof Long || value instanceof Float || value instanceof Double) {
+                    double doubleToUse = ((Number) value).doubleValue();
+                    extrasMap.putDouble(key, doubleToUse);
+                } else if (value instanceof Boolean) {
+                    extrasMap.putBoolean(key, (Boolean) value);
+                } else if (JSONObject.NULL.equals(value)) {
+                    extrasMap.putNull(key);
+                } else {
+                    extrasMap.putString(key, jsonObject.getString(key));
+                }
+
             }
             writableMap.putMap(JConstants.EXTRAS, extrasMap);
         } catch (Throwable throwable) {
